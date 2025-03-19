@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 
 // Actualizar la URL de la API para asegurar que sea correcta
-const API_URL = "https://reactvolt.onrender.com"
+const API_URL = "https://jenn.onrender.com"
 
 export default function AuthForm() {
   const router = useRouter()

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Navbar from "../componentes/navbar"
 
-const API_URL = "https://reactvolt.onrender.com"
+const API_URL = "https://jenn.onrender.com"
 
 export default function Inicio() {
   const router = useRouter()
