@@ -95,37 +95,8 @@ export default function AuthForm() {
       // Almacenar ID de usuario en localStorage
       localStorage.setItem("userId", data.userId)
 
-      // Obtener el rol del usuario para determinar la ruta de redirección
-      try {
-        const userResponse = await fetch(`${API_URL}/usuarios/${data.userId}`, {
-          headers: {
-            Accept: "application/json",
-          },
-        })
-
-        if (!userResponse.ok) {
-          throw new Error("No se pudo obtener información del usuario")
-        }
-
-        const userData = await userResponse.json()
-        const userRole = userData.rol
-
-        // Redireccionar según el rol del usuario
-        if (userRole === "jugador") {
-          router.push("/inicio")
-        } else if (userRole === "entrenador") {
-          router.push("/entrenador")
-        } else if (userRole === "tecnico") {
-          router.push("/tecnico")
-        } else {
-          // Redirección predeterminada
-          router.push("/inicio")
-        }
-      } catch (roleError) {
-        console.error("Error al obtener el rol del usuario:", roleError)
-        // Redirección predeterminada si falla la verificación del rol
-        router.push("/inicio")
-      }
+      // Redireccionar a /inicio directamente
+      router.push("/inicio")
     } catch (error) {
       console.error("Error de inicio de sesión:", error)
       setError(error.message || "Error al iniciar sesión")
@@ -367,22 +338,47 @@ export default function AuthForm() {
                       step="0.01"
                       className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
                     />
-                    <input
-                      type="text"
-                      name="posicion"
-                      placeholder="Posición"
-                      value={registerData.posicion}
-                      onChange={handleRegisterChange}
-                      className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
-                    />
-                    <input
-                      type="date"
-                      name="fecha_nacimiento"
-                      placeholder="Fecha de nacimiento"
-                      value={registerData.fecha_nacimiento}
-                      onChange={handleRegisterChange}
-                      className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
-                    />
+                    <div className="w-[84%] mx-auto my-3">
+                      <label className="block text-white text-sm mb-1">Posición</label>
+                      <select
+                        name="posicion"
+                        value={registerData.posicion}
+                        onChange={handleRegisterChange}
+                        className="w-full p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                        required
+                      >
+                        <option value="" className="bg-gray-800">
+                          Selecciona una posición
+                        </option>
+                        <option value="punta" className="bg-gray-800">
+                          Punta
+                        </option>
+                        <option value="central" className="bg-gray-800">
+                          Central
+                        </option>
+                        <option value="armador" className="bg-gray-800">
+                          Armador
+                        </option>
+                        <option value="opuesto" className="bg-gray-800">
+                          Opuesto
+                        </option>
+                        <option value="libero" className="bg-gray-800">
+                          Líbero
+                        </option>
+                      </select>
+                    </div>
+                    <div className="w-[84%] mx-auto my-3">
+                      <label className="block text-white text-sm mb-1">Fecha de nacimiento</label>
+                      <input
+                        type="date"
+                        name="fecha_nacimiento"
+                        placeholder="Fecha de nacimiento"
+                        value={registerData.fecha_nacimiento}
+                        onChange={handleRegisterChange}
+                        className="w-full p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                        required
+                      />
+                    </div>
                   </>
                 )}
 
