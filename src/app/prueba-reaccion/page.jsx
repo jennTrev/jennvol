@@ -41,11 +41,7 @@ export default function PruebaReaccion() {
           <div className="mt-8 text-gray-600">
             <h2 className="text-xl font-semibold mb-4 text-[#1E3A8A]">Instrucciones:</h2>
             <ol className="text-left max-w-2xl mx-auto space-y-2">
-              <li>1. Presiona el botón "Iniciar" cuando estés listo.</li>
-              <li>2. Espera a que el botón cambie de color (aparecerá en un momento aleatorio).</li>
-              <li>3. Haz clic lo más rápido posible cuando veas el cambio.</li>
-              <li>4. Tu tiempo de reacción se mostrará en pantalla.</li>
-              <li>5. Puedes repetir la prueba varias veces para mejorar tu tiempo.</li>
+           
             </ol>
           </div>
         </div>
