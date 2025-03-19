@@ -95,8 +95,30 @@ export default function AuthForm() {
       // Almacenar ID de usuario en localStorage
       localStorage.setItem("userId", data.userId)
 
-      // Redireccionar a /inicio directamente
-      router.push("/inicio")
+      // Obtener información del usuario para guardar el rol
+      try {
+        const userResponse = await fetch(`${API_URL}/usuarios/${data.userId}`, {
+          headers: {
+            Accept: "application/json",
+          },
+        })
+
+        if (!userResponse.ok) {
+          throw new Error("No se pudo obtener información del usuario")
+        }
+
+        const userData = await userResponse.json()
+
+        // Guardar el rol del usuario en localStorage
+        localStorage.setItem("userRole", userData.rol)
+
+        // Redireccionar según el rol del usuario
+        router.push("/inicio")
+      } catch (roleError) {
+        console.error("Error al obtener el rol del usuario:", roleError)
+        // Redirección predeterminada si falla la verificación del rol
+        router.push("/inicio")
+      }
     } catch (error) {
       console.error("Error de inicio de sesión:", error)
       setError(error.message || "Error al iniciar sesión")
@@ -225,7 +247,7 @@ export default function AuthForm() {
                   placeholder="Usuario"
                   value={loginData.user}
                   onChange={handleLoginChange}
-                  className="block w-[84%] mx-auto my-5 p-2.5 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-lg transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                  className="block w-[84%] mx-auto my-5 p-2.5 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-lg transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                   required
                 />
                 <input
@@ -234,13 +256,13 @@ export default function AuthForm() {
                   placeholder="Contraseña"
                   value={loginData.password}
                   onChange={handleLoginChange}
-                  className="block w-[84%] mx-auto my-5 p-2.5 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-lg transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                  className="block w-[84%] mx-auto my-5 p-2.5 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-lg transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                   required
                 />
                 <button
                   type="submit"
                   disabled={loading}
-                  className="block w-[84%] mx-auto my-5 p-2.5 text-center bg-[#E12836] text-white rounded disabled:opacity-50"
+                  className="block w-[84%] mx-auto my-5 p-2.5 text-center bg-[#1E3A8A] text-white rounded disabled:opacity-50"
                 >
                   {loading ? "Cargando..." : "Iniciar Sesión"}
                 </button>
@@ -264,7 +286,7 @@ export default function AuthForm() {
                     name="rol"
                     value={registerData.rol}
                     onChange={handleRegisterChange}
-                    className="w-full p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                    className="w-full p-2 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                     required
                   >
                     <option value="jugador" className="bg-gray-800">
@@ -286,7 +308,7 @@ export default function AuthForm() {
                   placeholder="Nombre"
                   value={registerData.nombre}
                   onChange={handleRegisterChange}
-                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                   required
                 />
                 <input
@@ -295,7 +317,7 @@ export default function AuthForm() {
                   placeholder="Apellido"
                   value={registerData.apellido}
                   onChange={handleRegisterChange}
-                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                   required
                 />
                 <input
@@ -304,7 +326,7 @@ export default function AuthForm() {
                   placeholder="Usuario"
                   value={registerData.user}
                   onChange={handleRegisterChange}
-                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                   required
                 />
                 <input
@@ -313,7 +335,7 @@ export default function AuthForm() {
                   placeholder="Contraseña"
                   value={registerData.contrasena}
                   onChange={handleRegisterChange}
-                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                   required
                 />
                 <input
@@ -322,7 +344,7 @@ export default function AuthForm() {
                   placeholder="Correo electrónico"
                   value={registerData.correo}
                   onChange={handleRegisterChange}
-                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                  className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                   required
                 />
 
@@ -336,7 +358,7 @@ export default function AuthForm() {
                       value={registerData.altura}
                       onChange={handleRegisterChange}
                       step="0.01"
-                      className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                      className="block w-[84%] mx-auto my-3 p-2 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                     />
                     <div className="w-[84%] mx-auto my-3">
                       <label className="block text-white text-sm mb-1">Posición</label>
@@ -344,7 +366,7 @@ export default function AuthForm() {
                         name="posicion"
                         value={registerData.posicion}
                         onChange={handleRegisterChange}
-                        className="w-full p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                        className="w-full p-2 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                         required
                       >
                         <option value="" className="bg-gray-800">
@@ -375,7 +397,7 @@ export default function AuthForm() {
                         placeholder="Fecha de nacimiento"
                         value={registerData.fecha_nacimiento}
                         onChange={handleRegisterChange}
-                        className="w-full p-2 bg-transparent border-l-[5px] border-l-[#E12836] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#E12836]/20 focus:rounded-[20px] focus:border-transparent"
+                        className="w-full p-2 bg-transparent border-l-[5px] border-l-[#1E3A8A] text-white font-light text-base transition-all duration-200 focus:outline-none focus:bg-[#1E3A8A]/20 focus:rounded-[20px] focus:border-transparent"
                         required
                       />
                     </div>
@@ -385,7 +407,7 @@ export default function AuthForm() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="block w-[84%] mx-auto my-3 p-2 text-center bg-[#E12836] text-white rounded disabled:opacity-50"
+                  className="block w-[84%] mx-auto my-3 p-2 text-center bg-[#1E3A8A] text-white rounded disabled:opacity-50"
                 >
                   {loading ? "Registrando..." : "Registrarse"}
                 </button>
@@ -402,7 +424,7 @@ export default function AuthForm() {
         {formType === "login" && (
           <div className="absolute w-full h-[30px] bottom-0.5 left-0">
             <div
-              className="relative float-left w-full mx-auto bg-black/20 border-b-2 border-b-[#E12836] cursor-pointer"
+              className="relative float-left w-full mx-auto bg-black/20 border-b-2 border-b-[#1E3A8A] cursor-pointer"
               onClick={() => setFormType("register")}
             >
               <p className="m-0 leading-[30px] text-center text-gray-300 text-xs font-thin">Nuevo Usuario</p>
