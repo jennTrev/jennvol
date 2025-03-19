@@ -2,73 +2,142 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { Home, User, TestTube, LogOut, Menu } from "lucide-react"
+import { Home, Users, BarChart2, LogOut, Menu, Zap, Activity, Cpu, Settings } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function Navbar() {
   const router = useRouter()
   const [activeItem, setActiveItem] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [userRole, setUserRole] = useState(null)
   const navbarRef = useRef(null)
   const selectorRef = useRef(null)
   const navItemsRef = useRef([])
 
-  const menuItems = [
-    { name: "Inicio", icon: <Home size={18} />, href: "/inicio" },
-    { name: "Perfil", icon: <User size={18} />, href: "/profile" },
-    { name: "Pruebas", icon: <TestTube size={18} />, href: "/tests" },
-    {
-      name: "Salir",
-      icon: <LogOut size={18} />,
-      href: "#",
-      onClick: () => {
-        localStorage.removeItem("userId")
-        router.push("/")
-      },
-    },
-  ]
+  // Definir menús según el rol
+  const getMenuItems = (role) => {
+    switch (role) {
+      case "jugador":
+        return [
+          { name: "Inicio", icon: <Home size={18} />, href: "/inicio" },
+          { name: "Prueba Reacción", icon: <Zap size={18} />, href: "/prueba-reaccion" },
+          { name: "Prueba Salto", icon: <Activity size={18} />, href: "/prueba-salto" },
+          {
+            name: "Salir",
+            icon: <LogOut size={18} />,
+            href: "#",
+            onClick: () => {
+              localStorage.removeItem("userId")
+              localStorage.removeItem("userRole")
+              router.push("/")
+            },
+          },
+        ]
+      case "entrenador":
+        return [
+          { name: "Inicio", icon: <Home size={18} />, href: "/inicio" },
+          { name: "Jugadores", icon: <Users size={18} />, href: "/jugadores" },
+          { name: "Resultados", icon: <BarChart2 size={18} />, href: "/resultados" },
+          {
+            name: "Salir",
+            icon: <LogOut size={18} />,
+            href: "#",
+            onClick: () => {
+              localStorage.removeItem("userId")
+              localStorage.removeItem("userRole")
+              router.push("/")
+            },
+          },
+        ]
+      case "tecnico":
+        return [
+          { name: "Inicio", icon: <Home size={18} />, href: "/inicio" },
+          { name: "Sensores", icon: <Cpu size={18} />, href: "/sensores" },
+          { name: "Actuadores", icon: <Settings size={18} />, href: "/actuadores" },
+          {
+            name: "Salir",
+            icon: <LogOut size={18} />,
+            href: "#",
+            onClick: () => {
+              localStorage.removeItem("userId")
+              localStorage.removeItem("userRole")
+              router.push("/")
+            },
+          },
+        ]
+      default:
+        return [
+          { name: "Inicio", icon: <Home size={18} />, href: "/inicio" },
+          {
+            name: "Salir",
+            icon: <LogOut size={18} />,
+            href: "#",
+            onClick: () => {
+              localStorage.removeItem("userId")
+              localStorage.removeItem("userRole")
+              router.push("/")
+            },
+          },
+        ]
+    }
+  }
 
-  // Agregar navegación basada en roles al montar el componente
+  // Obtener el rol del usuario al cargar el componente
   useEffect(() => {
-    const checkUserRole = async () => {
-      const userId = localStorage.getItem("userId")
+    // Primero intentar obtener el rol desde localStorage
+    const storedRole = localStorage.getItem("userRole")
 
-      if (userId) {
-        try {
-          const response = await fetch(`https://reactvolt.onrender.com/usuarios/${userId}`)
+    if (storedRole) {
+      setUserRole(storedRole)
+    } else {
+      // Si no está en localStorage, obtenerlo de la API
+      const checkUserRole = async () => {
+        const userId = localStorage.getItem("userId")
 
-          if (response.ok) {
-            const userData = await response.json()
-            const userRole = userData.rol
+        if (userId) {
+          try {
+            const response = await fetch(`https://reactvolt.onrender.com/usuarios/${userId}`)
 
-            // Establecer el elemento activo correcto según la ruta actual
-            const path = window.location.pathname
+            if (response.ok) {
+              const userData = await response.json()
+              setUserRole(userData.rol)
 
-            if (path.includes("/inicio")) {
-              setActiveItem(0)
-            } else if (path.includes("/profile")) {
-              setActiveItem(1)
-            } else if (path.includes("/tests")) {
-              setActiveItem(2)
+              // Guardar el rol en localStorage para futuras referencias
+              localStorage.setItem("userRole", userData.rol)
             }
-
-            // Redirigir si el usuario está en el panel incorrecto
-            if (userRole === "entrenador" && path === "/inicio") {
-              router.push("/entrenador")
-            } else if (userRole === "tecnico" && path === "/inicio") {
-              router.push("/tecnico")
-            } else if (userRole === "jugador" && (path === "/entrenador" || path === "/tecnico")) {
-              router.push("/inicio")
-            }
+          } catch (error) {
+            console.error("Error al verificar el rol del usuario:", error)
+            setUserRole("jugador") // Valor predeterminado en caso de error
           }
-        } catch (error) {
-          console.error("Error al verificar el rol del usuario:", error)
         }
       }
-    }
 
-    checkUserRole()
-  }, [router])
+      checkUserRole()
+    }
+  }, [])
+
+  // Obtener menú basado en el rol actual
+  const menuItems = getMenuItems(userRole || "jugador")
+
+  // Establecer el elemento activo según la ruta actual
+  useEffect(() => {
+    if (userRole) {
+      const path = window.location.pathname
+
+      // Determinar el índice activo basado en la ruta actual
+      let activeIndex = 0
+      const currentMenuItems = getMenuItems(userRole)
+
+      for (let i = 0; i < currentMenuItems.length; i++) {
+        if (path.includes(currentMenuItems[i].href) && currentMenuItems[i].href !== "/inicio") {
+          activeIndex = i
+          break
+        }
+      }
+
+      setActiveItem(activeIndex)
+    }
+  }, [userRole, router])
 
   // Actualizar la posición del selector cuando cambia el elemento activo
   useEffect(() => {
@@ -92,7 +161,7 @@ export default function Navbar() {
         }
       }
     }
-  }, [activeItem, isMobileMenuOpen])
+  }, [activeItem, isMobileMenuOpen, userRole])
 
   // Manejar el cambio de tamaño de la ventana
   useEffect(() => {
@@ -124,7 +193,7 @@ export default function Navbar() {
   }, [activeItem])
 
   return (
-    <nav className="bg-[#E12836] px-4 py-0 relative" ref={navbarRef}>
+    <nav className="bg-[#1E3A8A] px-4 py-0 relative" ref={navbarRef}>
       <div className="flex justify-between items-center">
         <Link href="/inicio" className="text-white py-4 font-bold text-xl">
           ReactVolt
@@ -142,13 +211,13 @@ export default function Navbar() {
           className={`lg:flex ${isMobileMenuOpen ? "block" : "hidden"} lg:items-center transition-all duration-300 w-full lg:w-auto`}
         >
           <ul className="lg:flex flex-col lg:flex-row relative p-0 m-0">
-            {/* Selector horizontal */}
+            {/* Selector horizontal - Cambiado a un color con mejor contraste */}
             <div
               ref={selectorRef}
-              className="absolute bg-white transition-all duration-600 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)] rounded-t-lg lg:mt-2.5"
+              className="absolute bg-[#4F85E5] transition-all duration-600 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)] rounded-t-lg lg:mt-2.5"
             >
-              <div className="absolute w-6 h-6 bg-white bottom-2.5 -right-6 before:content-[''] before:absolute before:w-12 before:h-12 before:rounded-full before:bg-[#E12836] before:bottom-0 before:-right-6"></div>
-              <div className="absolute w-6 h-6 bg-white bottom-2.5 -left-6 before:content-[''] before:absolute before:w-12 before:h-12 before:rounded-full before:bg-[#E12836] before:bottom-0 before:-left-6"></div>
+              <div className="absolute w-6 h-6 bg-[#4F85E5] bottom-2.5 -right-6 before:content-[''] before:absolute before:w-12 before:h-12 before:rounded-full before:bg-[#1E3A8A] before:bottom-0 before:-right-6"></div>
+              <div className="absolute w-6 h-6 bg-[#4F85E5] bottom-2.5 -left-6 before:content-[''] before:absolute before:w-12 before:h-12 before:rounded-full before:bg-[#1E3A8A] before:bottom-0 before:-left-6"></div>
             </div>
 
             {/* Elementos del menú */}
@@ -160,7 +229,9 @@ export default function Navbar() {
               >
                 <Link
                   href={item.href}
-                  className={`text-white/50 no-underline text-base block py-5 px-5 transition-duration-600 transition-timing-function-[cubic-bezier(0.68,-0.55,0.265,1.55)] relative ${activeItem === index ? "text-[#E12836]" : ""}`}
+                  className={`no-underline text-base block py-5 px-5 transition-duration-600 transition-timing-function-[cubic-bezier(0.68,-0.55,0.265,1.55)] relative ${
+                    activeItem === index ? "text-white font-medium" : "text-white/70 hover:text-white"
+                  }`}
                   onClick={(e) => {
                     if (item.onClick) {
                       e.preventDefault()
